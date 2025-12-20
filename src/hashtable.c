@@ -76,8 +76,11 @@ int HTGet(HashTable * hashTable, void * key, void * value) {
     if (hashTable->table[pos].key == NULL) {
         return 1;
     }
-    else {
+    else if (memcmp(value, hashTable->table[pos].value, hashTable->valueSize)) {
         memcpy(value, hashTable->table[pos].value, hashTable->valueSize);
         return 0;
+    }
+    else {
+        return 1;
     }
 }
