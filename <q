@@ -31,12 +31,12 @@ void printHashTable(HashTable * hashTable) {
         }
         else {
             printf("0x");
-            for (size_t hex_pos = 0; hex_pos < hashTable->keySize; hex_pos++) {
-                printf("%02x", ((uint8_t *) hashTable->table[i].key)[hex_pos]);
+            for (int hex_pos = hashTable->keySize - 1; hex_pos >= 0; hex_pos--) {
+                printf("%x", ((char *) hashTable->table[i].key)[hex_pos]);
             }
             printf(" : ");
-            for (size_t hex_pos = 0; hex_pos < hashTable->valueSize; hex_pos++) {
-                printf("%02x", ((uint8_t*) hashTable->table[i].value)[hex_pos]);
+            for (int hex_pos = 0; hex_pos < hashTable->valueSize; hex_pos++) {
+                printf("%x", ((char *) hashTable->table[i].value)[hex_pos]);
             }
         }
         printf("\n");
@@ -58,10 +58,12 @@ unsigned int hash(void * key, size_t len) {
 int HTInsert(HashTable * hashTable, void * key, void * value) {
     unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
     if (hashTable->table[pos].key != NULL) {
-        //TODO : account for collisions
         return 1;
     } 
     else {
+        printf("adding to pos : %u\n", pos);
+        printf("size of key : %lu\n", hashTable->keySize);
+        printf("size of value : %lu\n", hashTable->valueSize);
         hashTable->table[pos].key = (void *) malloc(hashTable->keySize);
         hashTable->table[pos].value = (void *) malloc(hashTable->valueSize);
         memcpy(hashTable->table[pos].key, key, hashTable->keySize);
@@ -71,13 +73,4 @@ int HTInsert(HashTable * hashTable, void * key, void * value) {
     }
 }
 
-int HTGet(HashTable * hashTable, void * key, void * value) {
-    unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
-    if (hashTable->table[pos].key == NULL) {
-        return 1;
-    }
-    else {
-        memcpy(value, hashTable->table[pos].value, hashTable->valueSize);
-        return 0;
-    }
-}
+
