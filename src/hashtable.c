@@ -117,6 +117,18 @@ int HTGet(HashTable * hashTable, void * key, void * value) {
     return 1;
 }
 
+
+int HTGeti(HashTable * hashTable, size_t index, void * key, void * value) {
+    if (hashTable->table[index].key == NULL || hashTable->table[index].key == DELETE_PTR) {
+        return -1;
+    }
+    else {
+        memcpy(key, hashTable->table[pos].key, hashTable->keySize);
+        memcpy(value, hashTable->table[pos].value, hashTable->valueSize);
+        return 0;
+    }
+}
+
 int HTDelete(HashTable * hashTable, void * key) {
     unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
 
