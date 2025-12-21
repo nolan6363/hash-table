@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#define STARTING_HT_SIZE 16
+#define STARTING_HT_SIZE 4
 
 typedef struct {
     void * key;
@@ -15,11 +15,13 @@ typedef struct {
     size_t tableSize;
     size_t keySize;
     size_t valueSize;
+    size_t occupancy;
 } HashTable;
 
-HashTable * createHashTable(size_t keySize, size_t valueSize);
+HashTable * createHashTable(size_t keySize, size_t valueSize, size_t initialSize);
 void printHashTable(HashTable * hashTable);
 unsigned int hash(void * key, size_t key_size);
 int HTInsert(HashTable * hashTable, void * key, void * value);
 int HTGet(HashTable * hashTable, void * key, void * value);
 int HTDelete(HashTable * hashTable, void * key);
+int HTScaleIfNeeded(HashTable * oldHashTable);

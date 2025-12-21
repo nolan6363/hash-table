@@ -3,19 +3,21 @@
 #include "hashtable.h"
 
 int main() {
-    printf("Hello, World!\n");
-
-    HashTable * table = createHashTable(6, 4);
+    HashTable * table = createHashTable(6, 4, 0);
     //printHashTable(table);
     
     char * name1 = "Eytha";
     char * name2 = "Nolan";
     char * name3 = "Samue";
     char * name4 = "Bayon";
+    char * name5 = "Aliss";
+
     int age1 = 20;
     int age2 = 22;
     int age3 = 24;
     int age4 = 26;
+    int age5 = 28;
+
     if (HTInsert(table, name1, &age1)) {
         printf("error adding to hash table\n");
     }
@@ -58,7 +60,14 @@ int main() {
     else {
         printf("age got for %s : %d\n", name4, ageRecup);
     }
+
+    if (HTInsert(table, name4, &age4)) {
+        printf("error adding to hash table\n");
+    }
+    printHashTable(table);
+
     
+    printf("final table occupancy : %ld\n", table->occupancy);
     /*
     printf("hash of Nolan is %d\n", hash("Nolan", 6) % 16);
     printf("hash of Loris is %d\n", hash("Loris", 6) % 16);

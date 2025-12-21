@@ -15,12 +15,18 @@ unsigned int _rotl(unsigned int value, int shift) {
     return (value << shift) | (value >> (32 - shift));
 }
 
-HashTable * createHashTable(size_t keySize, size_t valueSize) {
+HashTable * createHashTable(size_t keySize, size_t valueSize, size_t initialSize) {
     HashTable * hashTable = (HashTable *) malloc(sizeof(HashTable));
-    hashTable->table = (KV *) calloc(STARTING_HT_SIZE, sizeof(KV));
-    hashTable->tableSize = STARTING_HT_SIZE;
+    if(initialSize == 0) {
+        hashTable->tableSize = STARTING_HT_SIZE;
+    }
+    else {
+        hashTable->tableSize = initialSize;
+    }
+    hashTable->table = (KV *) calloc(hashTable->tableSize, sizeof(KV));
     hashTable->keySize = keySize;
     hashTable->valueSize = valueSize;
+    hashTable->occupancy = 0;
 
     return hashTable;
 }
@@ -61,6 +67,7 @@ unsigned int hash(void * key, size_t len) {
 }
 
 int HTInsert(HashTable * hashTable, void * key, void * value) {
+    HTScaleIfNeeded(hashTable);
     unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
     for (int i = 0; i < hashTable->tableSize; i++) {
         if (hashTable->table[pos].key == NULL || hashTable->table[pos].key == DELETE_PTR) {
@@ -68,6 +75,7 @@ int HTInsert(HashTable * hashTable, void * key, void * value) {
             hashTable->table[pos].value = (void *) malloc(hashTable->valueSize);
             memcpy(hashTable->table[pos].key, key, hashTable->keySize);
             memcpy(hashTable->table[pos].value, value, hashTable->valueSize);
+            hashTable->occupancy += 1;
 
             return 0;
         } 
@@ -112,6 +120,8 @@ int HTDelete(HashTable * hashTable, void * key) {
             free(hashTable->table[pos].value);
             hashTable->table[pos].key = DELETE_PTR;
             hashTable->table[pos].value = DELETE_PTR;
+            hashTable->occupancy -= 1;
+
             return 0;
         }
         else {
@@ -121,4 +131,25 @@ int HTDelete(HashTable * hashTable, void * key) {
     }
 
     return 1;
+}
+
+int HTScaleIfNeeded(HashTable * oldHashTable) {
+    if (oldHashTable->occupancy < oldHashTable->tableSize * 0.75) {
+        return 0;
+    }
+    else {
+        HashTable * newHashTable = createHashTable(oldHashTable->keySize, oldHashTable->valueSize, oldHashTable->tableSize * 2);
+
+        for (size_t i = 0; i < oldHashTable->tableSize; i++) {
+            if (oldHashTable->table[i].key == NULL || oldHashTable->table[i].key == DELETE_PTR) {
+                continue;
+            }
+            else {
+                HTInsert(newHashTable, oldHashTable->table[i].key, oldHashTable->table[i].value);
+            }
+        }
+        free(oldHashTable->table);
+        memcpy(oldHashTable, newHashTable, sizeof(HashTable));
+        return 1;
+    }
 }
