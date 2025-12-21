@@ -67,34 +67,27 @@ unsigned int hash(void * key, size_t len) {
 }
 
 int HTInsert(HashTable * hashTable, void * key, void * value) {
-    if (HTScaleIfNeeded(hashTable) < 0) {
-        return -1;
-    }
-    
-    unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
-    for (int i = 0; i < hashTable->tableSize; i++) {
-        if (hashTable->table[pos].key == NULL || hashTable->table[pos].key == DELETE_PTR) {
-            hashTable->table[pos].key = (void *) malloc(hashTable->keySize);
-            hashTable->table[pos].value = (void *) malloc(hashTable->valueSize);
-            memcpy(hashTable->table[pos].key, key, hashTable->keySize);
-            memcpy(hashTable->table[pos].value, value, hashTable->valueSize);
-            hashTable->occupancy += 1;
+    if (!HTScaleIfNeeded(hashTable)) {
+        unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
+        for (int i = 0; i < hashTable->tableSize; i++) {
+            if (hashTable->table[pos].key == NULL || hashTable->table[pos].key == DELETE_PTR) {
+                hashTable->table[pos].key = (void *) malloc(hashTable->keySize);
+                hashTable->table[pos].value = (void *) malloc(hashTable->valueSize);
+                memcpy(hashTable->table[pos].key, key, hashTable->keySize);
+                memcpy(hashTable->table[pos].value, value, hashTable->valueSize);
+                hashTable->occupancy += 1;
 
-            return 0;
-        } 
-        else if (memcmp(key, hashTable->table[pos].key, hashTable->keySize) == 0) {
-            memcpy(hashTable->table[pos].value, value, hashTable->valueSize);
-            
-            return 1;
-        }
-        else {
-            pos = (pos + 1) % hashTable->tableSize;
+                return 0;
+            } 
+            else {
+                pos = (pos + 1) % hashTable->tableSize;
 
-            continue; 
+                continue; 
+            }
         }
+        return 1;
     }
-    
-    return -1;
+    else return 0;
 }
 
 int HTGet(HashTable * hashTable, void * key, void * value) {

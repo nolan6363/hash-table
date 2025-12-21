@@ -61,13 +61,19 @@ int main() {
         printf("age got for %s : %d\n", name4, ageRecup);
     }
 
-    if (HTInsert(table, name4, &age4)) {
+    if (HTInsert(table, name4, &age5)) {
+        printf("error adding to hash table\n");
+    }
+    printHashTable(table);
+    
+    if (HTInsert(table, name5, &age5)) {
         printf("error adding to hash table\n");
     }
     printHashTable(table);
 
     
     printf("final table occupancy : %ld\n", table->occupancy);
+    printf("final table size : %ld\n", table->tableSize);
     /*
     printf("hash of Nolan is %d\n", hash("Nolan", 6) % 16);
     printf("hash of Loris is %d\n", hash("Loris", 6) % 16);
