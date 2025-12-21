@@ -23,5 +23,6 @@ void printHashTable(HashTable * hashTable);
 unsigned int hash(void * key, size_t key_size);
 int HTInsert(HashTable * hashTable, void * key, void * value);
 int HTGet(HashTable * hashTable, void * key, void * value);
+int HTGeti(HashTable * hashTable, size_t index, void * key, void * value);
 int HTDelete(HashTable * hashTable, void * key);
 int HTScaleIfNeeded(HashTable * oldHashTable);
