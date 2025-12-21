@@ -136,7 +136,7 @@ int HTDelete(HashTable * hashTable, void * key) {
         if (hashTable->table[pos].key == NULL) {
             return 1;
         }
-        else if (memcmp(key, hashTable->table[pos].key, hashTable->keySize) == 0) {
+        else if (hashTable->table[pos].key != DELETE_PTR && memcmp(key, hashTable->table[pos].key, hashTable->keySize) == 0) {
             free(hashTable->table[pos].key);
             free(hashTable->table[pos].value);
             hashTable->table[pos].key = DELETE_PTR;
