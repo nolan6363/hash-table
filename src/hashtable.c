@@ -6,6 +6,8 @@
 #define FNV_OFFSET_BASIS_32 2166136261u
 #define FNV_PRIME_32 16777619u
 
+#define DELETE_PTR (void *) 0xFFFFFFFFFFFFFFFF
+
 //from http://en.wikipedia.org/wiki/Circular_shift
 unsigned int _rotl(unsigned int value, int shift) {
     if ((shift &= 31) == 0)
@@ -28,6 +30,9 @@ void printHashTable(HashTable * hashTable) {
         printf("[%ld] ==> ", i);
         if (hashTable->table[i].key == NULL) {
             printf("---");
+        }
+        else if (hashTable->table[i].key == DELETE_PTR) {
+            printf("<deleted>");
         }
         else {
             printf("0x");
@@ -58,17 +63,18 @@ unsigned int hash(void * key, size_t len) {
 int HTInsert(HashTable * hashTable, void * key, void * value) {
     unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
     for (int i = 0; i < hashTable->tableSize; i++) {
-        if (hashTable->table[pos].key != NULL) {
-            pos = (pos + 1) % hashTable->tableSize;
-            continue; 
-        } 
-        else {
+        if (hashTable->table[pos].key == NULL || hashTable->table[pos].key == DELETE_PTR) {
             hashTable->table[pos].key = (void *) malloc(hashTable->keySize);
             hashTable->table[pos].value = (void *) malloc(hashTable->valueSize);
             memcpy(hashTable->table[pos].key, key, hashTable->keySize);
             memcpy(hashTable->table[pos].value, value, hashTable->valueSize);
 
             return 0;
+        } 
+        else {
+            pos = (pos + 1) % hashTable->tableSize;
+
+            continue; 
         }
     }
     return 1;
@@ -81,7 +87,7 @@ int HTGet(HashTable * hashTable, void * key, void * value) {
         if (hashTable->table[pos].key == NULL) {
             return 1;
         }
-        else if (memcmp(key, hashTable->table[pos].key, hashTable->keySize) == 0) {
+        else if (hashTable->table[pos].key != DELETE_PTR && memcmp(key, hashTable->table[pos].key, hashTable->keySize) == 0) {
             memcpy(value, hashTable->table[pos].value, hashTable->valueSize);
             return 0;
         }
@@ -89,6 +95,29 @@ int HTGet(HashTable * hashTable, void * key, void * value) {
             pos = (pos + 1) % hashTable->tableSize;
             continue;
         }
+    }
+
+    return 1;
+}
+
+int HTDelete(HashTable * hashTable, void * key) {
+    unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
+
+    for (int i = 0; i < hashTable->tableSize; i++) {
+        if (hashTable->table[pos].key == NULL) {
+            return 1;
+        }
+        else if (memcmp(key, hashTable->table[pos].key, hashTable->keySize) == 0) {
+            free(hashTable->table[pos].key);
+            free(hashTable->table[pos].value);
+            hashTable->table[pos].key = DELETE_PTR;
+            hashTable->table[pos].value = DELETE_PTR;
+            return 0;
+        }
+        else {
+            pos = (pos + 1) % hashTable->tableSize;
+            continue;
+        } 
     }
 
     return 1;
