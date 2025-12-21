@@ -123,8 +123,8 @@ int HTGeti(HashTable * hashTable, size_t index, void * key, void * value) {
         return -1;
     }
     else {
-        memcpy(key, hashTable->table[pos].key, hashTable->keySize);
-        memcpy(value, hashTable->table[pos].value, hashTable->valueSize);
+        memcpy(key, hashTable->table[index].key, hashTable->keySize);
+        memcpy(value, hashTable->table[index].value, hashTable->valueSize);
         return 0;
     }
 }
