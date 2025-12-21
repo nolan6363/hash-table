@@ -9,13 +9,18 @@ int main() {
     //printHashTable(table);
     
     char * name1 = "Thoma";
-    char * name2 = "Gauth";
+    char * name2 = "Marce";
+    char * name3 = "Gauth";
     int age1 = 20;
-    int age2= 22;
+    int age2 = 22;
+    int age3 = 24;
     if (HTInsert(table, name1, &age1)) {
         printf("erreur adding to hash table\n");
     }
     if (HTInsert(table, name2, &age2)) {
+        printf("erreur adding to hash table\n");
+    }
+    if (HTInsert(table, name3, &age3)) {
         printf("erreur adding to hash table\n");
     }
     printHashTable(table);
@@ -24,14 +29,14 @@ int main() {
     if (HTGet(table, name1, &ageRecup)) {
         printf("erreur getting the value\n");
     } else {
-        printf("age got : %d\n", ageRecup);
+        printf("age got for %s : %d\n", name1, ageRecup);
     }
 
-    if (HTGet(table, name2, &ageRecup)) {
+    if (HTGet(table, name3, &ageRecup)) {
         printf("erreur getting the value\n");
     }
     else {
-        printf("age got : %d\n", ageRecup);
+        printf("age got for %s : %d\n", name3, ageRecup);
     }
     
     /*
@@ -46,7 +51,6 @@ int main() {
     printf("hash of Alien is %d\n", hash("Alien", 6) % 16);
     printf("hash of Thais is %d\n", hash("Thais", 6) % 16);
     printf("hash of Sasha is %d\n", hash("Sasha", 6) % 16);
-    */
-
+    */ 
     return 0;
 }

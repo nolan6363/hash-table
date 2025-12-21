@@ -57,30 +57,39 @@ unsigned int hash(void * key, size_t len) {
 
 int HTInsert(HashTable * hashTable, void * key, void * value) {
     unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
-    if (hashTable->table[pos].key != NULL) {
-        //TODO : account for collisions
-        return 1;
-    } 
-    else {
-        hashTable->table[pos].key = (void *) malloc(hashTable->keySize);
-        hashTable->table[pos].value = (void *) malloc(hashTable->valueSize);
-        memcpy(hashTable->table[pos].key, key, hashTable->keySize);
-        memcpy(hashTable->table[pos].value, value, hashTable->valueSize);
+    for (int i = 0; i < hashTable->tableSize; i++) {
+        if (hashTable->table[pos].key != NULL) {
+            pos = (pos + 1) % hashTable->tableSize;
+            continue; 
+        } 
+        else {
+            hashTable->table[pos].key = (void *) malloc(hashTable->keySize);
+            hashTable->table[pos].value = (void *) malloc(hashTable->valueSize);
+            memcpy(hashTable->table[pos].key, key, hashTable->keySize);
+            memcpy(hashTable->table[pos].value, value, hashTable->valueSize);
 
-        return 0;
+            return 0;
+        }
     }
+    return 1;
 }
 
 int HTGet(HashTable * hashTable, void * key, void * value) {
     unsigned int pos = hash(key, hashTable->keySize) % hashTable->tableSize;
-    if (hashTable->table[pos].key == NULL) {
-        return 1;
+
+    for (int i = 0; i < hashTable->tableSize; i++) {
+        if (hashTable->table[pos].key == NULL) {
+            return 1;
+        }
+        else if (memcmp(key, hashTable->table[pos].key, hashTable->keySize) == 0) {
+            memcpy(value, hashTable->table[pos].value, hashTable->valueSize);
+            return 0;
+        }
+        else {
+            pos = (pos + 1) % hashTable->tableSize;
+            continue;
+        }
     }
-    else if (memcmp(value, hashTable->table[pos].value, hashTable->valueSize)) {
-        memcpy(value, hashTable->table[pos].value, hashTable->valueSize);
-        return 0;
-    }
-    else {
-        return 1;
-    }
+
+    return 1;
 }
